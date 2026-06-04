@@ -1,0 +1,371 @@
+\documentclass[11pt]{beamer}
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+% Colores personalizados
+\definecolor{azulmarkov}{RGB}{30, 90, 160}
+\setbeamercolor{frametitle}{fg=white, bg=azulmarkov}
+\setbeamercolor{title}{fg=white, bg=azulmarkov}
+\setbeamercolor{block title}{fg=white, bg=azulmarkov}
+\setbeamercolor{block body}{bg=azulmarkov!10}
+
+% Quitar nombre del footline, dejar solo título y número de página
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}
+      \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+    \end{beamercolorbox}%
+  }%
+}
+
+% Comandos utiles
+\newcommand{\io}{\text{ i.o.}}
+
+%--------------------------------------------------
+\title[Lema de Borel-Cantelli]{Lema de Borel-Cantelli\\y su conexión con Procesos Estocásticos}
+\subtitle{Materia: Procesos Estocásticos}
+\author{Emiliano Ruiz Sánchez}
+\institute{Facultad de Estudios Superiores Acatlán \\ Universidad Nacional Autónoma de México}
+\date{}
+%--------------------------------------------------
+
+\begin{document}
+
+%--- Diapositiva 1: Título ---
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%--- Diapositiva 2: Introducción ---
+\begin{frame}{Introducción: El Mono Infinito}
+
+  Imaginemos a un mono golpeando teclas al azar en una máquina de escribir
+  durante un tiempo infinito.
+
+  \bigskip
+
+  \textbf{¿Podría escribir el \textit{Hamlet} de Shakespeare?}
+
+  \bigskip
+
+  \begin{block}{Respuesta matemática}
+    Sí, con probabilidad $1$ --- y no solo una vez, sino \textbf{infinitas veces}.
+  \end{block}
+
+  \bigskip
+
+  Sea $q$ el número de teclas y $k$ el número de caracteres de \textit{Hamlet}.
+  Dividimos la cadena en bloques de longitud $k$. Sea $E_n$ el evento de que
+  el $n$-ésimo bloque sea \textit{Hamlet}:
+  \[
+    P(E_n) = \frac{1}{q^k} > 0, \qquad
+    \sum_{n=1}^{\infty} P(E_n) = \infty, \qquad
+    E_n \text{ independientes.}
+  \]
+
+  \medskip
+  Por el \textbf{Segundo Lema de Borel-Cantelli}: $P(E_n \io) = 1$.
+
+  \medskip
+  \textit{Esta es exactamente la pregunta que responde el lema.}
+
+\end{frame}
+
+%--- Diapositiva 3: Contexto histórico ---
+\begin{frame}{Contexto Histórico}
+
+  \begin{itemize}
+    \item \textbf{Émile Borel} (1871--1956): publica el primer resultado en
+          1909 en el estudio de \textit{probabilidades numerables}.
+    \item \textbf{Francesco Paolo Cantelli} (1875--1966): extiende y precisa
+          el resultado en 1917.
+    \item Borel introduce la metáfora de los monos en su artículo de 1913
+          \textit{``Mécanique Statistique et Irréversibilité''}.
+    \item \textbf{Arthur Eddington} retoma la imagen en 1928 para ilustrar
+          escalas de tiempo en mecánica estadística.
+  \end{itemize}
+
+  \bigskip
+
+  \begin{alertblock}{Nota histórica}
+    La independencia fue cuestionada por Felix Bernstein (1911), quien
+    señaló que la aplicación de Borel a las fracciones continuadas usaba
+    ensayos dependientes. Borel respondió en 1912 extendiendo el resultado
+    al caso dependiente.
+  \end{alertblock}
+
+\end{frame}
+
+%--- Diapositiva 4: Motivación y Definiciones ---
+\begin{frame}{Motivación y Definiciones}
+
+  \small % Reducimos ligeramente la fuente general de la diapositiva
+  \textbf{Marco de trabajo.} Sea $(\Omega, \mathcal{F}, P)$ un espacio de probabilidad y
+  $\{A_n\}_{n \geq 1} \subset \mathcal{F}$ una sucesión de eventos.
+
+  \vspace{-0.2cm}
+
+  \begin{block}{Límite Superior (Infinitas veces)}
+    \[
+      \limsup_{n \to \infty} A_n
+      \;=\; \bigcap_{n=1}^{\infty} \bigcup_{k=n}^{\infty} A_k
+      \;=\; \{A_n \io\}
+    \]
+    El evento de que $A_n$ ocurra \textbf{infinitamente seguido} (\emph{infinitely often}).
+  \end{block}
+
+  \vspace{-0.2cm}
+
+  \begin{block}{Límite Inferior (Casi siempre)}
+    \[
+      \liminf_{n \to \infty} A_n
+      \;=\; \bigcup_{n=1}^{\infty} \bigcap_{k=n}^{\infty} A_k
+    \]
+    El evento de que $A_n$ ocurra para todos los índices salvo un número finito.
+  \end{block}
+
+  \vspace{0.1cm}
+  \centering
+  {\footnotesize \textbf{El Lema de Borel-Cantelli se centra en el límite superior:}\\ ¿Cuándo $P(A_n \io) = 0$ y cuándo $P(A_n \io) = 1$?}
+
+\end{frame}
+%--- Diapositiva 5: Lema 1 ---
+\begin{frame}{Primer Lema de Borel-Cantelli}
+
+  \begin{block}{Lema 1}
+    Si $\displaystyle\sum_{n=1}^{\infty} P(A_n) < \infty$,
+    entonces $P(A_n \io) = 0$.
+  \end{block}
+
+  \bigskip
+  \textbf{Idea de la demostración} (en pizarrón):
+
+  \medskip
+  \begin{enumerate}
+    \item Usar continuidad de la medida en la intersección decreciente.
+    \item Aplicar subaditividad:
+          $P\!\left(\bigcup_{k=n}^\infty A_k\right)
+          \leq \sum_{k=n}^\infty P(A_k)$.
+    \item La cola de una serie convergente tiende a $0$.
+  \end{enumerate}
+
+  \bigskip
+  \begin{alertblock}{Observación clave}
+    \textbf{No se requiere ninguna hipótesis adicional} sobre los $A_n$.\\
+    Solo basta que la serie converja.
+  \end{alertblock}
+
+\end{frame}
+
+%--- Diapositiva 6: Lema 2 ---
+\begin{frame}{Segundo Lema de Borel-Cantelli}
+
+  \begin{block}{Lema 2}
+    Si $\{A_n\}$ son \textbf{independientes} y
+    $\displaystyle\sum_{n=1}^{\infty} P(A_n) = \infty$,
+    entonces $P(A_n \io) = 1$.
+  \end{block}
+
+  \bigskip
+  \textbf{Idea de la demostración} (en pizarrón):
+
+  \medskip
+  \begin{enumerate}
+    \item Trabajar con el complemento: basta ver que
+          $P\!\left(\bigcap_{k=n}^{\infty} A_k^c\right) = 0$.
+    \item Por independencia:
+          $P\!\left(\bigcap_{k=n}^{N} A_k^c\right)
+          = \prod_{k=n}^{N}(1 - P(A_k))$.
+    \item Usar $1 - x \leq e^{-x}$:
+          $\displaystyle\prod_{k=n}^{N}(1-P(A_k))
+          \leq \exp\!\left(-\sum_{k=n}^{N} P(A_k)\right) \to 0$.
+  \end{enumerate}
+
+  \bigskip
+  \begin{alertblock}{La independencia es necesaria}
+    Contraejemplo: $A_n = A$ para todo $n$, con $P(A) = \tfrac{1}{2}$.\\
+    Entonces $\sum P(A_n) = \infty$ pero $P(A_n \io) = \tfrac{1}{2} \neq 1$.
+  \end{alertblock}
+
+\end{frame}
+
+%--- Diapositiva 7: Conexión con Markov ---
+\begin{frame}{Conexión con Cadenas de Markov}
+
+  Sea $\{X_n\}_{n \geq 0}$ una cadena de Markov con espacio de estados $S$.
+
+  \medskip
+  \textbf{Clasificación de estados.} Para $i \in S$, sea
+  $f_i = P_i(\exists\, n \geq 1 : X_n = i)$.
+
+  \[
+    i \text{ es }
+    \begin{cases}
+      \textbf{recurrente} & \text{si } f_i = 1 \\[4pt]
+      \textbf{transitorio} & \text{si } f_i < 1
+    \end{cases}
+  \]
+
+  \medskip
+  \textbf{¿Dónde entra Borel-Cantelli?} Consideremos $A_n = \{X_n = i\}$.
+
+  \medskip
+  \textbf{Caso transitorio:} $\displaystyle\sum_{n=0}^\infty P_i(X_n = i) < \infty$
+  $\;\Rightarrow\;$ por el \textbf{Lema 1}:
+  \[
+    P_i(X_n = i \io) = 0
+  \]
+
+  \medskip
+  \textit{Nota:} Los $A_n$ \textbf{no son independientes}, por lo que el
+  Lema 2 no aplica directamente. La recurrencia requiere un argumento
+  de renovación.
+
+\end{frame}
+
+%--- Diapositiva 8: Criterio analítico ---
+\begin{frame}{Criterio Analítico de Recurrencia}
+
+  \begin{block}{Teorema}
+    \[
+      \sum_{n=0}^{\infty} P_i(X_n = i)
+      \begin{cases}
+        < \infty & \Longrightarrow \quad i \text{ es transitorio} \\[6pt]
+        = \infty & \Longrightarrow \quad i \text{ es recurrente}
+      \end{cases}
+    \]
+  \end{block}
+
+  \bigskip
+  \textbf{El Lema de Borel-Cantelli nos da gratuitamente la implicación izquierda.}
+
+  \bigskip
+
+  \begin{block}{Resumen}
+    \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{ll}
+      \textbf{Lema 1} & $\sum P(A_n) < \infty \;\Rightarrow\; P(A_n \io) = 0$ \quad (siempre) \\
+      \textbf{Lema 2} & $\sum P(A_n) = \infty \;\Rightarrow\; P(A_n \io) = 1$ \quad (con independencia)
+    \end{tabular}
+    \end{center}
+  \end{block}
+
+\end{frame}
+
+%--- Diapositiva 9: Aplicaciones ---
+\begin{frame}{Aplicaciones}
+
+  \begin{itemize}
+    \item \textbf{Mono infinito.} El Lema 2 garantiza que cualquier texto
+          finito aparece infinitas veces casi seguramente.
+
+    \medskip
+    \item \textbf{Ley Fuerte de los Grandes Números.} El Lema 1 es
+          herramienta estándar en su demostración vía desigualdades de
+          concentración.
+
+    \medskip
+    \item \textbf{Moneda con probabilidad decreciente.} Si $P(H_n) = 1/n$
+          y los lanzamientos son independientes, como $\sum 1/n = \infty$,
+          el Lema 2 garantiza $P(H_n \io) = 1$.
+
+    \medskip
+    \item \textbf{Martingalas.} Aparece en la prueba de que caminatas
+          aleatorias escapan de compactos casi seguramente.
+
+    \medskip
+    \item \textbf{Ley cero-uno.} Para eventos independientes,
+          $P(A_n \io) \in \{0, 1\}$ siempre. Es un caso particular
+          de la Ley Cero-Uno de Kolmogorov.
+
+    \medskip
+    \item \textbf{Cadenas de Markov.} El Lema 1 identifica estados
+          transitorios mediante el criterio analítico de recurrencia.
+  \end{itemize}
+
+\end{frame}
+
+%--- Diapositiva 10: Conclusión ---
+\begin{frame}{Conclusión}
+
+  El Lema de Borel-Cantelli responde una pregunta aparentemente simple
+  con una condición completamente analítica: basta estudiar la
+  \textbf{convergencia de una serie}.
+
+  \bigskip
+
+  Lo notable es que esta herramienta, nacida en teoría de la medida,
+  aparece naturalmente en procesos estocásticos para
+  \textbf{clasificar el comportamiento a largo plazo} de una cadena
+  de Markov, sin necesidad de simular ni de calcular probabilidades
+  de retorno directamente.
+
+  \bigskip
+
+  \begin{block}{En dos líneas}
+    \[
+      \sum P(A_n) < \infty \implies P(A_n \io) = 0
+    \]
+    \[
+      \sum P(A_n) = \infty \xrightarrow{\;\text{+ independencia}\;} P(A_n \io) = 1
+    \]
+    La primera es siempre gratis. La segunda cuesta independencia.\\
+    En cadenas de Markov, la primera nos alcanza para identificar
+    estados transitorios.
+  \end{block}
+
+\end{frame}
+
+%--- Diapositiva 11: Referencias ---
+\begin{frame}{Referencias}
+
+  \begin{thebibliography}{6}
+    \footnotesize
+
+    \bibitem{wiki}
+    Wikipedia.
+    \textit{Borel–Cantelli lemma}.
+    \url{https://en.wikipedia.org/wiki/Borel-Cantelli_lemma}
+
+    \bibitem{tesis}
+    Gutiérrez Andrade, M.\,A. (1983).
+    \textit{Análisis del trabajo de Émile Borel sobre sucesiones infinitas
+    de ensayos Bernoulli}.
+    Tesis de licenciatura, Facultad de Ciencias, UNAM.
+
+    \bibitem{uribe}
+    Uribe Bravo, G.
+    \textit{Procesos Estocásticos II --- Notas del curso}.
+    Instituto de Matemáticas, UNAM.
+    \url{https://www.matem.unam.mx/~geronimo/}
+
+    \bibitem{rincon}
+    Rincón, L. (2007).
+    \textit{Curso intermedio de Probabilidad}.
+    Departamento de Matemáticas, Facultad de Ciencias, UNAM.
+
+    \bibitem{uba}
+    Fernández, R.
+    \textit{Notas sobre el Lema de Borel-Cantelli}.
+    Universidad de Buenos Aires.
+
+    \bibitem{youtube}
+    3Blue1Brown.
+    \textit{The Borel-Cantelli Lemma} [video].
+    \url{https://youtu.be/3dqVenOIOgQ}
+
+  \end{thebibliography}
+
+\end{frame}
+
+\end{document}

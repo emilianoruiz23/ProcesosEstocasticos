@@ -1,0 +1,256 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+\begin{document}
+
+% ==========================================
+%                 PORTADA
+% ==========================================
+\begin{titlepage}
+    \centering
+    % Descomenta la siguiente línea si tienes el archivo de la imagen (UNAMLOGO.PNG) en tu carpeta
+    % \includegraphics[width=0.45\textwidth]{UNAMLOGO.PNG} \\
+    \vspace{1cm}
+    
+    Universidad Nacional Autónoma de México \\
+    Facultad de Estudios Superiores Acatlán \\
+    División de Matemáticas e Ingeniería \\
+    Licenciatura en Matemáticas Aplicadas y Computación \\
+    \vspace{1.5cm}
+    
+    Nombre: Emiliano Ruiz Sánchez \\
+    \vspace{1.5cm}
+            
+    Materia: Procesos Estocásticos \\
+        
+\end{titlepage}
+
+\newpage
+
+% ==========================================
+%                 CONTENIDO
+% ==========================================
+
+\section{Caminatas Aleatorias y Martingalas}
+
+\subsection{Conceptos Fundamentales}
+Una caminata aleatoria simple se puede modelar mediante una sucesión de variables aleatorias independientes e idénticamente distribuidas (i.i.d.) $X_1, X_2, \dots$. Si definimos $S_n = \sum_{i=1}^n X_i$, entonces $S_n$ representa la posición o ganancia acumulada en el tiempo $n$. 
+
+Para que este proceso sea considerado una \textbf{martingala} (un modelo de juego justo), la esperanza condicional del valor futuro, dada toda la información hasta el tiempo presente $\mathcal{F}_n$, debe ser estrictamente igual al valor presente:
+$$ \mathbb{E}[S_{n+1} | \mathcal{F}_n] = S_n $$
+Esto implica que no existe una tendencia predecible o "deriva" hacia el alza (submartingala) ni hacia la baja (supermartingala). Para tratar procesos con deriva en teoría avanzada, se emplean tiempos de paro y cambios de medida (teorema de Radon-Nikodym) para transformar el proceso subyacente de nuevo en una martingala.
+
+\subsection{Contexto Financiero: Hipótesis de Mercados Eficientes}
+En la matemática financiera, el concepto estocástico de martingala está íntimamente ligado a la \textbf{Hipótesis de los Mercados Eficientes (HME)} o \textit{Random Walk Hypothesis}. Esta teoría sugiere que, en un mercado altamente competitivo, los precios de los activos reflejan instantáneamente toda la información pública disponible, por lo que sus variaciones futuras ocurren de manera aleatoria e impredecible. 
+
+Fue Paul Samuelson (1965) quien demostró matemáticamente que, en un mercado informacionalmente eficiente, el precio de un activo (apropiadamente descontado) sigue una martingala. Esto significa que la mejor estimación para el precio del mañana es el precio de hoy; la propiedad de martingala asegura la ausencia de patrones predecibles o de oportunidades de arbitraje sin riesgo en los modelos de valoración modernos.
+
+\vspace{0.5cm}
+
+\section{Desarrollo de Ejercicios Selectos}
+
+A continuación, se presenta la aplicación formal de la teoría de caminatas aleatorias y martingalas sobre ejercicios selectos.
+
+\subsection{Ejercicio 1.2: Caminata Aleatoria en $\mathbb{Z}$}
+Sea $(X_n)$ la caminata aleatoria en $\mathbb{Z}$: $X_0 = 0$, $X_{n+1} = X_{n} + \xi_{n+1}$ con $\xi$ i.i.d., $P(\xi=+1)=p$ y $P(\xi=-1)=q=1-p$.
+
+\vspace{0.3cm}
+\noindent \textbf{(a) Calcule $\mathbb{E}^0[X_n]$ y $\mathbb{E}^0[X_n^2]$}.
+
+\begin{proof}[Desarrollo Analítico]
+Dado que la posición en el tiempo $n$ es la suma de los incrementos individuales, tenemos $X_n = \sum_{i=1}^n \xi_i$. Primero calculamos los momentos de un solo incremento $\xi_i$:
+\begin{align*}
+    \mathbb{E}[\xi_i] &= (1)P(\xi=1) + (-1)P(\xi=-1) = p - q \\
+    \mathbb{E}[\xi_i^2] &= (1)^2P(\xi=1) + (-1)^2P(\xi=-1) = p + q = 1
+\end{align*}
+
+Para el primer momento de la caminata $\mathbb{E}^0[X_n]$, aplicamos la linealidad de la esperanza:
+$$ \mathbb{E}[X_n] = \mathbb{E}\left[\sum_{i=1}^n \xi_i\right] = \sum_{i=1}^n \mathbb{E}[\xi_i] = \sum_{i=1}^n (p-q) = n(p-q) $$
+
+Para el segundo momento $\mathbb{E}^0[X_n^2]$, expandimos el cuadrado de la suma:
+$$ \mathbb{E}[X_n^2] = \mathbb{E}\left[ \left(\sum_{i=1}^n \xi_i\right)^2 \right] = \mathbb{E}\left[ \sum_{i=1}^n \xi_i^2 + \sum_{i \neq j} \xi_i \xi_j \right] $$
+Aplicando linealidad nuevamente, separamos en dos sumas:
+$$ \mathbb{E}[X_n^2] = \sum_{i=1}^n \mathbb{E}[\xi_i^2] + \sum_{i \neq j} \mathbb{E}[\xi_i \xi_j] $$
+Para los términos cruzados donde $i \neq j$, utilizamos la propiedad de independencia de los incrementos, lo que implica que $\mathbb{E}[\xi_i \xi_j] = \mathbb{E}[\xi_i]\mathbb{E}[\xi_j] = (p-q)^2$. El número total de términos cruzados es $n(n-1)$. Sustituyendo:
+$$ \mathbb{E}[X_n^2] = n(1) + n(n-1)(p-q)^2 = n + n(n-1)(p-q)^2 $$
+\end{proof}
+
+\vspace{0.5cm}
+
+\subsection{Ejercicio 3.1: Teorema de Paro Opcional y Ruina del Jugador}
+Sea $(M_n)$ una martingala respecto de la filtración $(\mathcal{F}_n)$ y $\tau$ un tiempo de paro.
+
+\vspace{0.3cm}
+\noindent \textbf{(a) Enuncie el teorema de paro opcional de Doob y dé condiciones suficientes para $\mathbb{E}^x[M_\tau] = \mathbb{E}^x[M_0]$}.
+
+\begin{proof}[Teorema y Condiciones]
+\textbf{Teorema de Paro Opcional (Doob):} Si $(M_n)$ es una martingala en tiempo discreto y $\tau$ es un tiempo de paro respecto a la filtración $\mathcal{F}_n$, entonces el proceso detenido $M_{n \wedge \tau}$ preserva la propiedad de martingala. 
+
+Para garantizar que el valor esperado al momento de detenerse sea igual al valor esperado inicial ($\mathbb{E}[M_\tau] = \mathbb{E}[M_0]$), basta con que se cumpla \textbf{al menos una} de las siguientes condiciones:
+\begin{enumerate}
+    \item El tiempo de paro está acotado casi seguramente por una constante determinista $N < \infty$.
+    \item El tiempo de paro tiene esperanza finita ($\mathbb{E}[\tau] < \infty$) y los incrementos de la martingala están uniformemente acotados ($|M_{n+1} - M_n| \le C$).
+    \item La martingala detenida está uniformemente acotada por una variable aleatoria integrable.
+\end{enumerate}
+\end{proof}
+
+\vspace{0.3cm}
+\noindent \textbf{(c) Para $p \neq q$, muestre que $M_n = (q/p)^{X_n}$ es martingala y úsela para calcular $P^0(T_b < T_{-a})$ directamente}.
+
+\begin{proof}[Demostración de Martingala Exponencial]
+Primero, demostraremos que $M_n = (q/p)^{X_n}$ es una martingala calculando su esperanza condicional.
+\begin{align*}
+    \mathbb{E}[M_{n+1} | \mathcal{F}_n] &= \mathbb{E}\left[(q/p)^{X_{n+1}} | \mathcal{F}_n\right] \\
+    &= \mathbb{E}\left[(q/p)^{X_n + \xi_{n+1}} | \mathcal{F}_n\right] \\
+    &= (q/p)^{X_n} \cdot \mathbb{E}\left[(q/p)^{\xi_{n+1}} | \mathcal{F}_n\right] \quad \text{(pues $X_n$ es $\mathcal{F}_n$-medible)}
+\end{align*}
+Como $\xi_{n+1}$ es independiente de $\mathcal{F}_n$, su esperanza condicional es su esperanza incondicional:
+$$ \mathbb{E}\left[(q/p)^{\xi_{n+1}}\right] = \left(\frac{q}{p}\right)^1 P(\xi_{n+1}=1) + \left(\frac{q}{p}\right)^{-1} P(\xi_{n+1}=-1) = \left(\frac{q}{p}\right)p + \left(\frac{p}{q}\right)q = q + p = 1 $$
+Sustituyendo esto de vuelta, obtenemos $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n \cdot 1 = M_n$, probando que es una martingala.
+
+\vspace{0.3cm}
+\textbf{Cálculo de la Probabilidad de Ruina:} \\
+Definimos el tiempo de paro $\tau = \min(T_b, T_{-a})$, que es el primer instante en que la caminata toca la barrera superior $b$ o la inferior $-a$. Dado que las condiciones del Teorema de Paro Opcional se cumplen en un dominio acotado, aplicamos $\mathbb{E}[M_\tau] = \mathbb{E}[M_0]$.
+
+Evaluamos $M_0$:
+$$ M_0 = (q/p)^{X_0} = (q/p)^0 = 1 $$
+
+Evaluamos la esperanza en $\tau$. En el tiempo $\tau$, la caminata $X_\tau$ solo puede tomar dos valores: $b$ (si golpea la barrera superior primero) o $-a$ (si golpea la inferior).
+$$ \mathbb{E}[M_\tau] = P^0(T_b < T_{-a}) \left(\frac{q}{p}\right)^b + P^0(T_{-a} < T_b) \left(\frac{q}{p}\right)^{-a} $$
+Sabiendo que $P^0(T_{-a} < T_b) = 1 - P^0(T_b < T_{-a})$, igualamos a $\mathbb{E}[M_0] = 1$:
+$$ 1 = P^0(T_b < T_{-a}) \left(\frac{q}{p}\right)^b + \left[1 - P^0(T_b < T_{-a})\right] \left(\frac{q}{p}\right)^{-a} $$
+
+Despejando $P^0(T_b < T_{-a})$ obtenemos la clásica fórmula de ruina:
+$$ P^0(T_b < T_{-a}) \left[ \left(\frac{q}{p}\right)^b - \left(\frac{q}{p}\right)^{-a} \right] = 1 - \left(\frac{q}{p}\right)^{-a} $$
+$$ P^0(T_b < T_{-a}) = \frac{1 - (q/p)^{-a}}{(q/p)^b - (q/p)^{-a}} $$
+\end{proof}
+
+\vspace{0.5cm}
+
+\section{Ejercicios Adicionales: Estrategias de Juego y Teoremas Clásicos}
+
+\subsection{Ejercicio A: La Estrategia de Apuestas "La Martingala" (Paradoja de San Petersburgo)}
+Considere un juego de casino con una moneda justa ($P(\text{ganar}) = P(\text{perder}) = 1/2$). Un jugador adopta la siguiente estrategia previsible: apuesta $1$ peso en la primera ronda. Si pierde, dobla su apuesta en la siguiente ronda ($2$ pesos, luego $4$, $8$, etc.). Si gana, se detiene y se retira del juego. 
+
+Sea $X_i \in \{-1, 1\}$ el resultado de la ronda $i$, y $B_i$ la cantidad apostada (donde $B_i$ es $\mathcal{F}_{i-1}$-medible). La ganancia en la ronda $i$ es $B_i X_i$. El capital acumulado es $S_n = \sum_{i=1}^n B_i X_i$. Sea $\tau$ el tiempo de paro definido como la primera vez que el jugador gana: $\tau = \min\{n \ge 1 : X_n = 1\}$.
+
+\vspace{0.3cm}
+\noindent \textbf{(a) Demuestre que el capital al momento de retirarse es determinista y siempre igual a $1$ peso ($S_\tau = 1$).}
+
+\begin{proof}[Desarrollo Analítico]
+Analicemos la trayectoria del jugador hasta el tiempo $\tau$. Por definición de $\tau$, el jugador pierde todas las rondas desde la $1$ hasta la $\tau - 1$, y gana en la ronda $\tau$.
+Los resultados son $X_1 = -1, X_2 = -1, \dots, X_{\tau-1} = -1, X_\tau = 1$.
+
+Las apuestas realizadas, al irse doblando, son $B_1 = 1, B_2 = 2, B_3 = 4, \dots, B_i = 2^{i-1}$.
+Las pérdidas acumuladas hasta el tiempo $\tau - 1$ son la suma de una progresión geométrica:
+$$ \text{Pérdidas} = \sum_{i=1}^{\tau-1} B_i (-1) = - \sum_{i=1}^{\tau-1} 2^{i-1} = - (1 + 2 + 4 + \dots + 2^{\tau-2}) $$
+Aplicando la fórmula de la suma parcial de una serie geométrica $\sum_{k=0}^{n} r^k = \frac{r^{n+1}-1}{r-1}$, tenemos:
+$$ \text{Pérdidas} = - \left( \frac{2^{(\tau-1)} - 1}{2 - 1} \right) = - (2^{\tau-1} - 1) = 1 - 2^{\tau-1} $$
+
+En la ronda $\tau$, el jugador gana, y su ganancia en esa ronda es exactamente la apuesta $B_\tau = 2^{\tau-1}$.
+El capital total al tiempo $\tau$ es la suma de las pérdidas anteriores más la ganancia final:
+$$ S_\tau = (1 - 2^{\tau-1}) + 2^{\tau-1} = 1 $$
+Por lo tanto, $\mathbb{E}[S_\tau] = 1$. Sin embargo, como $S_0 = 0$ y $(S_n)$ es una martingala, esto parece contradecir que $\mathbb{E}[S_\tau] = \mathbb{E}[S_0]$. La aparente paradoja se resuelve notando que la martingala no está uniformemente acotada y $\mathbb{E}[B_\tau] = \infty$, por lo que no se cumplen las condiciones del Teorema de Paro Opcional de Doob. El riesgo extremo de rachas negativas quiebra al jugador antes de alcanzar $\tau$ en la vida real.
+\end{proof}
+
+\vspace{0.5cm}
+
+\subsection{Ejercicio B: La Identidad de Wald}
+Sea $X_1, X_2, \dots$ una sucesión de variables aleatorias i.i.d. con esperanza finita $\mathbb{E}[X_1] = \mu$. Sea $S_n = \sum_{i=1}^n X_i$ la caminata aleatoria asociada. Sea $\tau$ un tiempo de paro con respecto a la filtración natural $\mathcal{F}_n$, tal que $\mathbb{E}[\tau] < \infty$.
+
+\vspace{0.3cm}
+\noindent \textbf{(a) Demuestre la Identidad de Wald: $\mathbb{E}[S_\tau] = \mu \mathbb{E}[\tau]$.}
+
+\begin{proof}[Demostración Formal]
+Podemos reescribir la suma aleatoria $S_\tau$ utilizando la función indicadora $\mathbf{1}_{\{\tau \ge i\}}$. Note que el evento $\{\tau \ge i\}$ es equivalente a $\{\tau \le i - 1\}^c$. Como $\tau$ es un tiempo de paro, el evento $\{\tau \le i - 1\}$ pertenece a $\mathcal{F}_{i-1}$. Por lo tanto, $\mathbf{1}_{\{\tau \ge i\}}$ es una variable aleatoria $\mathcal{F}_{i-1}$-medible.
+
+Expresamos $S_\tau$ como una serie infinita:
+$$ S_\tau = \sum_{i=1}^\tau X_i = \sum_{i=1}^\infty X_i \mathbf{1}_{\{\tau \ge i\}} $$
+
+Tomamos la esperanza en ambos lados. Dado que $\mathbb{E}[\tau] < \infty$, podemos intercambiar la esperanza y la suma infinita (por el Teorema de Convergencia Dominada o el Lema de Fatou adaptado):
+$$ \mathbb{E}[S_\tau] = \mathbb{E}\left[ \sum_{i=1}^\infty X_i \mathbf{1}_{\{\tau \ge i\}} \right] = \sum_{i=1}^\infty \mathbb{E}[ X_i \mathbf{1}_{\{\tau \ge i\}} ] $$
+
+Dado que $\mathbf{1}_{\{\tau \ge i\}}$ depende de los eventos hasta el tiempo $i-1$, es independiente de la variable futura $X_i$ (ya que las $X_i$ son i.i.d.). La esperanza del producto de variables independientes es el producto de las esperanzas:
+$$ \mathbb{E}[ X_i \mathbf{1}_{\{\tau \ge i\}} ] = \mathbb{E}[X_i] \mathbb{E}[\mathbf{1}_{\{\tau \ge i\}}] = \mu P(\tau \ge i) $$
+
+Sustituyendo esto en la suma infinita:
+$$ \mathbb{E}[S_\tau] = \sum_{i=1}^\infty \mu P(\tau \ge i) = \mu \sum_{i=1}^\infty P(\tau \ge i) $$
+
+Finalmente, recordamos una propiedad fundamental de las variables aleatorias discretas no negativas: $\sum_{i=1}^\infty P(\tau \ge i) = \mathbb{E}[\tau]$. Sustituyendo esto, obtenemos el resultado deseado:
+$$ \mathbb{E}[S_\tau] = \mu \mathbb{E}[\tau] $$
+\end{proof}
+
+\vspace{0.5cm}
+
+\subsection{Ejercicio C: La Urna de Pólya (Martingala de Proporciones)}
+Considere una urna que inicialmente contiene $b_0$ bolas blancas y $n_0$ bolas negras. En cada paso $t \ge 1$, se extrae una bola al azar, se observa su color, y se devuelve a la urna junto con $c$ bolas adicionales del mismo color. 
+
+Sea $W_t$ el número de bolas blancas en el tiempo $t$, y $T_t = b_0 + n_0 + tc$ el número total de bolas. Definimos la proporción de bolas blancas como $M_t = \frac{W_t}{T_t}$.
+
+\vspace{0.3cm}
+\noindent \textbf{(a) Demuestre que el proceso de proporciones $(M_t)_{t \ge 0}$ es una martingala.}
+
+\begin{proof}[Desarrollo Analítico]
+Queremos demostrar que $\mathbb{E}[M_{t+1} | \mathcal{F}_t] = M_t$, donde $\mathcal{F}_t$ representa la historia de las extracciones hasta el tiempo $t$.
+En el tiempo $t+1$, la probabilidad de extraer una bola blanca es exactamente la proporción actual de bolas blancas, es decir, $M_t$. La probabilidad de extraer una negra es $1 - M_t$.
+
+Si se extrae una blanca, el nuevo número de bolas blancas será $W_t + c$. Si se extrae una negra, las bolas blancas se mantienen en $W_t$. En cualquier caso, el total de bolas pasa a ser $T_t + c$.
+Por lo tanto, la variable aleatoria $M_{t+1}$ toma los siguientes valores condicionados a $\mathcal{F}_t$:
+\begin{itemize}
+    \item $M_{t+1} = \frac{W_t + c}{T_t + c}$ con probabilidad $M_t$
+    \item $M_{t+1} = \frac{W_t}{T_t + c}$ con probabilidad $1 - M_t$
+\end{itemize}
+
+Calculamos la esperanza condicional:
+\begin{align*}
+    \mathbb{E}[M_{t+1} | \mathcal{F}_t] &= M_t \left( \frac{W_t + c}{T_t + c} \right) + (1 - M_t) \left( \frac{W_t}{T_t + c} \right) \\
+    &= \frac{M_t W_t + M_t c + W_t - M_t W_t}{T_t + c} \\
+    &= \frac{M_t c + W_t}{T_t + c}
+\end{align*}
+
+Recordando que por definición $W_t = M_t T_t$, sustituimos $W_t$:
+\begin{align*}
+    \mathbb{E}[M_{t+1} | \mathcal{F}_t] &= \frac{M_t c + M_t T_t}{T_t + c} \\
+    &= \frac{M_t (c + T_t)}{T_t + c} \\
+    &= M_t
+\end{align*}
+Como $\mathbb{E}[M_{t+1} | \mathcal{F}_t] = M_t$, la proporción de bolas blancas en la Urna de Pólya evoluciona como una martingala estricta.
+\end{proof}
+
+\vspace{0.5cm}
+
+\subsection{Ejercicio D: Cambio de Medida y Teorema de Radon-Nikodym}
+En la teoría de procesos estocásticos, cuando un proceso $(S_n)$ presenta una deriva bajo una medida de probabilidad inicial $\mathbb{P}$ (es decir, es una submartingala o supermartingala), es posible construir un "juego justo" cambiando la forma en que medimos las probabilidades de los eventos, sin alterar los eventos en sí.
+
+\vspace{0.3cm}
+\noindent \textbf{(a) Defina formalmente el cambio de medida probabilística mediante la variable de densidad y demuestre que $\mathbb{Q}$ define una medida de probabilidad válida sobre $\mathcal{F}_n$.}
+
+\begin{proof}[Desarrollo Analítico]
+Consideremos un espacio de probabilidad original $(\Omega, \mathcal{F}, \mathbb{P})$ equipado con una filtración $(\mathcal{F}_n)$. Sea $Z_n$ una variable aleatoria $\mathcal{F}_n$-medible, conocida como la variable de densidad o \textit{derivada de Radon-Nikodym} ($Z_n = \frac{d\mathbb{Q}}{d\mathbb{P}}$), que satisface las siguientes dos condiciones:
+\begin{enumerate}
+    \item Es no negativa casi seguramente: $\mathbb{P}(Z_n \ge 0) = 1$.
+    \item Su esperanza bajo la medida original es unitaria: $\mathbb{E}^{\mathbb{P}}[Z_n] = 1$.
+\end{enumerate}
+
+Definimos una nueva función de probabilidad $\mathbb{Q}$ para cualquier evento $A \in \mathcal{F}_n$ como la esperanza de la indicadora ponderada por $Z_n$:
+$$ \mathbb{Q}(A) = \mathbb{E}^{\mathbb{P}}[Z_n \mathbf{1}_A] = \int_A Z_n d\mathbb{P} $$
+
+Para confirmar que $\mathbb{Q}$ es efectivamente una medida de probabilidad, verificamos que satisface los axiomas de Kolmogorov:
+\begin{itemize}
+    \item \textbf{No negatividad:} Dado que $Z_n \ge 0$ y la función indicadora $\mathbf{1}_A \ge 0$, el producto es no negativo. La integral de una función no negativa es no negativa, por lo que $\mathbb{Q}(A) \ge 0$.
+    \item \textbf{Medida del espacio muestral total:} Para el evento seguro $\Omega$, la función indicadora es $\mathbf{1}_\Omega = 1$. Evaluando la medida obtenemos:
+    $$ \mathbb{Q}(\Omega) = \mathbb{E}^{\mathbb{P}}[Z_n \cdot 1] = 1 \quad \text{(por la segunda condición de } Z_n \text{)} $$
+    \item \textbf{$\sigma$-aditividad:} Sea $A_1, A_2, \dots$ una sucesión de eventos disjuntos en $\mathcal{F}_n$. La indicadora de su unión es la suma infinita de sus indicadoras: $\mathbf{1}_{\bigcup A_k} = \sum \mathbf{1}_{A_k}$. Aplicando la linealidad de la esperanza (respaldada por el Teorema de Convergencia Monótona debido a la no negatividad):
+    $$ \mathbb{Q}\left(\bigcup_{k=1}^\infty A_k\right) = \mathbb{E}^{\mathbb{P}}\left[ Z_n \sum_{k=1}^\infty \mathbf{1}_{A_k} \right] = \sum_{k=1}^\infty \mathbb{E}^{\mathbb{P}}[Z_n \mathbf{1}_{A_k}] = \sum_{k=1}^\infty \mathbb{Q}(A_k) $$
+\end{itemize}
+
+Habiendo comprobado los axiomas, concluimos que $\mathbb{Q}$ es una medida de probabilidad válida. Este procedimiento es el fundamento matemático para la valoración de opciones financieras (donde $\mathbb{Q}$ se conoce como la medida neutral al riesgo) y subyace a la inferencia estadística, donde $Z_n$ actúa como la función de verosimilitud (o ratio de verosimilitud) para actualizar probabilidades \textit{a priori} en probabilidades \textit{a posteriori} (Teorema de Bayes).
+\end{proof}
+
+\end{document}

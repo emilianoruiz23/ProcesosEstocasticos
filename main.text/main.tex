@@ -1,0 +1,527 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\geometry{a4paper, margin=2cm}
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows, babel}
+
+\title{\textbf{Guía Maestra: Procesos Estocásticos y Cadenas de Markov}}
+\author{Material de Preparación y Repaso Avanzado}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section{Análisis Exhaustivo del Ejercicio 1 (Matriz de 3x3)}
+Para analizar el comportamiento a largo plazo de una Cadena de Markov, es imperativo clasificar sus estados. Utilizaremos como caso de estudio la cadena definida por el espacio de estados $S = \{1, 2, 3\}$ y la matriz de transición:
+$$ P = \begin{bmatrix} 1/4 & 1/2 & 1/4 \\ 1/3 & 0 & 2/3 \\ 1/2 & 0 & 1/2 \end{bmatrix} $$
+
+\subsection{Diagrama de Transición de Estados}
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=3.5cm,on grid,auto]
+   \node[state] (q_1) {$1$};
+   \node[state] (q_2) [right=of q_1] {$2$};
+   \node[state] (q_3) [below=of q_1] {$3$};
+   \path[->]
+    (q_1) edge [loop left] node {1/4} ()
+          edge [bend left] node {1/2} (q_2)
+          edge [bend right] node[left] {1/4} (q_3)
+    (q_2) edge [bend left] node {1/3} (q_1)
+          edge [bend left] node {2/3} (q_3)
+    (q_3) edge [bend right] node[right] {1/2} (q_1)
+          edge [loop right] node {1/2} ();
+\end{tikzpicture}
+\end{center}
+
+\subsection{Comunicación e Irreducibilidad}
+\textbf{Definición:} Se dice que el estado $j$ es accesible desde el estado $i$ ($i \to j$) si existe un $n \geq 0$ tal que la probabilidad de transición en $n$ pasos es estrictamente positiva. Si $i \to j$ y $j \to i$, se dice que los estados \textit{se comunican} ($i \leftrightarrow j$). Si todos los estados del espacio $S$ se comunican entre sí, la cadena es \textbf{irreducible}.
+
+\textbf{Justificación Detallada:}
+\begin{itemize}
+    \item Desde el estado 1, podemos ir al estado 2 ($P_{1,2} = 1/2 > 0$) y al estado 3 ($P_{1,3} = 1/4 > 0$). Por lo tanto, $1 \to 2$ y $1 \to 3$.
+    \item Desde el estado 2, podemos ir al estado 1 ($P_{2,1} = 1/3 > 0$) y al estado 3 ($P_{2,3} = 2/3 > 0$). Por lo tanto, $2 \to 1$. Esto confirma que $1 \leftrightarrow 2$.
+    \item Desde el estado 3, podemos ir al estado 1 ($P_{3,1} = 1/2 > 0$). Por lo tanto, $3 \to 1$. Esto confirma que $1 \leftrightarrow 3$.
+\end{itemize}
+Por transitividad, todos los estados forman una única clase de comunicación. \textbf{Conclusión: La cadena es irreducible.}
+
+\subsection{Periodicidad y Clasificación Final}
+\textbf{Definición:} El periodo $d(i)$ de un estado $i$ es el máximo común divisor (MCD) del conjunto de tiempos $n$ en los que es posible regresar al estado $i$.
+
+\textbf{Justificación de Periodicidad:}
+Observamos la diagonal de la matriz $P$. El estado 1 tiene un bucle hacia sí mismo ($P_{1,1} = 1/4 > 0$). Esto significa que podemos regresar al estado 1 en exactamente 1 paso. Por lo tanto, $d(1) = \text{MCD}\{1, 2, 3, \dots\} = 1$. El estado 1 es aperiódico.
+Es un teorema fundamental que la periodicidad es una propiedad de clase. Como la cadena es irreducible, \textbf{todos los estados son aperiódicos}.
+
+\textbf{Recurrencia vs Transitoriedad:} En un espacio de estados finito irreducible, no existen estados transitorios. Todos los estados son inevitablemente \textbf{recurrentes positivos} (retornarán con probabilidad 1 y en un tiempo esperado finito).
+
+\subsection{Probabilidad de Alcance (Análogo a Absorción)}
+Dado que la cadena es irreducible, no tiene estados absorbentes per se. Sin embargo, aplicamos los sistemas de absorción para problemas de alcance. Calculemos la probabilidad $a_2$ de que la cadena, iniciando en el estado 2, alcance el estado 1 \textbf{antes} que el estado 3.
+\textbf{Condiciones de frontera:} $a_1 = 1$, $a_3 = 0$.
+\begin{align}
+    a_2 &= P_{2,1}a_1 + P_{2,2}a_2 + P_{2,3}a_3 \\
+    a_2 &= \frac{1}{3}(1) + 0(a_2) + \frac{2}{3}(0) = \frac{1}{3}
+\end{align}
+Existe una probabilidad de $1/3$ de transicionar al estado 1 antes que al 3 si comenzamos en el estado 2.
+
+\subsection{Tiempos de Paro (Hitting Times)}
+Calculemos $m_{1,3}$, el tiempo esperado para llegar al estado 3 partiendo del estado 1.
+Condición de frontera: $m_{3,3} = 0$. Ecuaciones para los transitorios 1 y 2:
+\begin{align}
+    m_{1,3} &= 1 + P_{1,1}m_{1,3} + P_{1,2}m_{2,3} = 1 + \frac{1}{4}m_{1,3} + \frac{1}{2}m_{2,3} \\
+    m_{2,3} &= 1 + P_{2,1}m_{1,3} + P_{2,2}m_{2,3} = 1 + \frac{1}{3}m_{1,3} + 0
+\end{align}
+Sustituimos la Ecuación (4) en la (3):
+\begin{align*}
+    m_{1,3} &= 1 + \frac{1}{4}m_{1,3} + \frac{1}{2}\left(1 + \frac{1}{3}m_{1,3}\right) = 1 + \frac{1}{4}m_{1,3} + \frac{1}{2} + \frac{1}{6}m_{1,3}
+\end{align*}
+Sumamos las constantes y coeficientes ($1/4 + 1/6 = 5/12$):
+\begin{align*}
+    m_{1,3} &= \frac{3}{2} + \frac{5}{12}m_{1,3} \implies \left(1 - \frac{5}{12}\right)m_{1,3} = \frac{3}{2} \implies \frac{7}{12}m_{1,3} = \frac{3}{2}
+\end{align*}
+Despejamos: $m_{1,3} = \frac{3}{2} \cdot \frac{12}{7} = \frac{36}{14} = \frac{18}{7} \approx 2.57 \text{ pasos}$.
+
+\subsection{Distribución Estacionaria ($\pi = \pi P$)}
+Planteamos el sistema global:
+\begin{align}
+    \pi_1 &= \frac{1}{4}\pi_1 + \frac{1}{3}\pi_2 + \frac{1}{2}\pi_3 \\
+    \pi_2 &= \frac{1}{2}\pi_1 \implies \pi_1 = 2\pi_2 \\
+    \pi_3 &= \frac{1}{4}\pi_1 + \frac{2}{3}\pi_2 + \frac{1}{2}\pi_3
+\end{align}
+Sustituimos $\pi_1 = 2\pi_2$ en la Ecuación (7):
+\begin{align*}
+    \pi_3 - \frac{1}{2}\pi_3 &= \frac{1}{4}(2\pi_2) + \frac{2}{3}\pi_2 \implies \frac{1}{2}\pi_3 = \frac{1}{2}\pi_2 + \frac{2}{3}\pi_2 = \frac{7}{6}\pi_2 \implies \pi_3 = \frac{7}{3}\pi_2
+\end{align*}
+Ecuación de Normalización:
+\begin{align*}
+    2\pi_2 + \pi_2 + \frac{7}{3}\pi_2 &= 1 \implies \left(\frac{6}{3} + \frac{3}{3} + \frac{7}{3}\right)\pi_2 = 1 \implies \frac{16}{3}\pi_2 = 1 \implies \pi_2 = \frac{3}{16}
+\end{align*}
+Calculamos el resto: $\pi_1 = 2(3/16) = 6/16 = 3/8$. $\pi_3 = (7/3)(3/16) = 7/16$.
+Distribución estacionaria: $\pi = \left[ \frac{6}{16}, \frac{3}{16}, \frac{7}{16} \right]$.
+
+\subsection{Teorema Ergódico (Tiempos de Retorno)}
+Los tiempos medios de retorno $r_i = 1/\pi_i$:
+\begin{align*}
+    r_1 &= \frac{1}{6/16} = \frac{16}{6} = \frac{8}{3} \approx 2.67 \text{ pasos.} \\
+    r_2 &= \frac{1}{3/16} = \frac{16}{3} \approx 5.33 \text{ pasos.} \\
+    r_3 &= \frac{1}{7/16} = \frac{16}{7} \approx 2.28 \text{ pasos.}
+\end{align*}
+
+\subsection{Proceso de Diagonalización: Eigenvalores Complejos}
+Determinemos si la matriz se diagonaliza resolviendo $\det(P - \lambda I) = 0$:
+$$ \begin{vmatrix} 1/4-\lambda & 1/2 & 1/4 \\ 1/3 & -\lambda & 2/3 \\ 1/2 & 0 & 1/2-\lambda \end{vmatrix} = 0 $$
+Evaluando el determinante general y aplicando que $\lambda_1 = 1$ (siempre presente en matrices estocásticas), dividimos el polinomio para encontrar las otras dos raíces.
+Sabemos que la Traza $\text{Tr}(P) = 1/4 + 0 + 1/2 = 3/4$. La suma de las raíces es $\lambda_1 + \lambda_2 + \lambda_3 = 3/4$, de donde $\lambda_2 + \lambda_3 = -1/4$.
+Calculamos el determinante de $P$: $\det(P) = 1/12$. Por lo tanto, $\lambda_2 \cdot \lambda_3 = 1/12$.
+La ecuación cuadrática que genera estas raíces es $12x^2 + 3x + 1 = 0$.
+Usando la fórmula general:
+$$ \lambda = \frac{-3 \pm \sqrt{9 - 48}}{24} = \frac{-3 \pm i\sqrt{39}}{24} $$
+\textbf{Conclusión:} La matriz posee \textbf{eigenvalores complejos conjugados}. Dado que sus tres eigenvalores son distintos en el plano complejo ($\lambda_1 = 1$, $\lambda_2 = \frac{-3 + i\sqrt{39}}{24}$, $\lambda_3 = \frac{-3 - i\sqrt{39}}{24}$), la matriz \textbf{sí es diagonalizable} ($P = VDV^{-1}$) trabajando en $\mathbb{C}$.
+
+\section{Probabilidades Conjuntas y Propiedad de Markov}
+Tomemos la matriz $P$ analizada anteriormente.
+
+\textbf{Reactivo de Evaluación:} Si sabemos que $P(X_1 = 1) = P(X_1 = 2) = 1/4$, calcule $P(X_1 = 3, X_2 = 2, X_3 = 1)$.
+\textbf{Paso 1:} $P(X_1 = 3) = 1 - (1/4 + 1/4) = 1/2$.
+\textbf{Paso 2 y 3:} Factorizamos:
+\begin{align*}
+    P(X_1 = 3, X_2 = 2, X_3 = 1) &= P(X_1 = 3) \cdot P_{3,2} \cdot P_{2,1} = \left( \frac{1}{2} \right) \cdot (0) \cdot \left( \frac{1}{3} \right) = 0
+\end{align*}
+La probabilidad de esta trayectoria exacta es 0, ya que $P_{3,2} = 0$.
+
+\section{Ecuaciones de Chapman-Kolmogorov y Diagonalización (2x2)}
+Analicemos la matriz general de 2 estados: $P = \begin{bmatrix} 1-a & a \\ b & 1-b \end{bmatrix}$ con $a,b \in (0,1)$.
+
+\subsection{Paso 1: Encontrar los Eigenvalores ($\lambda$)}
+Resolvemos la ecuación característica $\det(P - \lambda I) = 0$:
+\begin{align*}
+    \begin{vmatrix} 1-a-\lambda & a \\ b & 1-b-\lambda \end{vmatrix} &= 0 \\
+    (1-a-\lambda)(1-b-\lambda) - ab &= 0 \\
+    \lambda^2 - (2-a-b)\lambda + (1-a-b) &= 0
+\end{align*}
+Las raíces son $\lambda_1 = 1$ y $\lambda_2 = 1-a-b$.
+
+\subsection{Paso 2: Encontrar los Eigenvectores ($V$ y $V^{-1}$)}
+Resolviendo $(P - I)v = 0$ y $(P - (1-a-b)I)v = 0$, la matriz de eigenvectores y su inversa son:
+$$ V = \begin{bmatrix} 1 & -a \\ 1 & b \end{bmatrix}, \quad V^{-1} = \frac{1}{a+b} \begin{bmatrix} b & a \\ -1 & 1 \end{bmatrix} $$
+Calculamos el límite $\lim_{n \to \infty} P^n = V (\lim_{n \to \infty} D^n) V^{-1}$. Como $|1-a-b| < 1$, el término $(1-a-b)^n \to 0$:
+$$ P^\infty = \frac{1}{a+b} \begin{bmatrix} b & a \\ b & a \end{bmatrix} $$
+
+\section{Probabilidades de Absorción (Análisis de Primer Paso)}
+Consideremos una cadena con una clase absorbente $R_1 = \{1,2\}$ y estados transitorios $\{3,4\}$. Queremos calcular $a_i$, la probabilidad de ser absorbido en $R_1$ dado que iniciamos en el estado $i$.
+
+\subsection{Planteamiento y Solución del Sistema}
+Condiciones de frontera: $a_1 = a_2 = 1$, y $a_7 = 0$ (otra clase absorbente).
+\begin{align}
+    a_3 &= P_{3,1}a_1 + P_{3,4}a_4 = \frac{1}{2}(1) + \frac{1}{2}a_4 = \frac{1}{2} + \frac{1}{2}a_4 \\
+    a_4 &= P_{4,3}a_3 + P_{4,7}a_7 = \frac{1}{2}a_3 + \frac{1}{2}(0) = \frac{1}{2}a_3
+\end{align}
+Sustituimos la Ecuación (10) dentro de la Ecuación (9):
+\begin{align*}
+    a_3 &= \frac{1}{2} + \frac{1}{2}\left( \frac{1}{2}a_3 \right) = \frac{1}{2} + \frac{1}{4}a_3 \\
+    \frac{3}{4}a_3 &= \frac{1}{2} \implies a_3 = \frac{2}{3}
+\end{align*}
+
+\section{Tiempos de Paro (Tiempo Esperado de Absorción)}
+Sea $t_i = E[T \mid X_0 = i]$ el número esperado de pasos hasta que la cadena alcance cualquier estado absorbente.
+
+\subsection{Planteamiento y Solución del Sistema}
+Condición de frontera: $t_i = 0$ si $i$ es absorbente.
+\begin{align}
+    t_3 &= 1 + P_{3,1}t_1 + P_{3,4}t_4 = 1 + \frac{1}{2}(0) + \frac{1}{2}t_4 = 1 + \frac{1}{2}t_4 \\
+    t_4 &= 1 + P_{4,3}t_3 + P_{4,7}t_7 = 1 + \frac{1}{2}t_3 + \frac{1}{2}(0) = 1 + \frac{1}{2}t_3
+\end{align}
+Sustituimos la Ecuación (12) dentro de la Ecuación (11):
+\begin{align*}
+    t_3 &= 1 + \frac{1}{2}\left( 1 + \frac{1}{2}t_3 \right) = \frac{3}{2} + \frac{1}{4}t_3 \\
+    \frac{3}{4}t_3 &= \frac{3}{2} \implies t_3 = 2 \text{ pasos}
+\end{align*}
+
+\section{Caminata Aleatoria Asimétrica: Estados Transitorios}
+Consideremos una cadena con espacio infinito numerable $S=\{0,1,2,\dots\}$ y probabilidades de transición $p_{i,i+1}=p$ y $p_{i,i-1}=1-p$ para $i\ge 1$, donde $p > 1/2$.
+
+\textbf{Inexistencia de Distribución Estacionaria:}
+Al ser $p > 1/2$, existe una deriva constante hacia la derecha. La probabilidad de retornar a $0$ desde cualquier estado $i$ es estrictamente menor a $1$. Esto hace que todos los estados sean \textbf{transitorios}. Al fugarse la probabilidad hacia el infinito, la suma de las ecuaciones de balance diverge y la masa de probabilidad escapa, por lo que \textbf{no existe distribución estacionaria}.
+
+\section{Ejercicio Integrador 1: Análisis Desmenuzado de 3x3}
+Consideremos la matriz de transición:
+$$ P = \begin{bmatrix} 0 & 1 & 0 \\ 1/6 & 1/2 & 1/3 \\ 0 & 2/3 & 1/3 \end{bmatrix} $$
+
+\subsection{Diagrama de Transición de Estados}
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+   \node[state] (q_1) {$1$};
+   \node[state] (q_2) [right=of q_1] {$2$};
+   \node[state] (q_3) [right=of q_2] {$3$};
+   \path[->]
+    (q_1) edge [bend left] node {1} (q_2)
+    (q_2) edge [bend left] node {1/6} (q_1)
+          edge [loop above] node {1/2} ()
+          edge [bend left] node {1/3} (q_3)
+    (q_3) edge [bend left] node {2/3} (q_2)
+          edge [loop above] node {1/3} ();
+\end{tikzpicture}
+\end{center}
+
+\subsection{Comunicación, Irreducibilidad y Periodicidad}
+\textbf{Comunicación:} $P_{1,2}=1 \implies 1\to 2$. $P_{2,1}=1/6 \implies 2\to 1$. Así, $1\leftrightarrow 2$.
+$P_{2,3}=1/3 \implies 2\to 3$. $P_{3,2}=2/3 \implies 3\to 2$. Así, $2\leftrightarrow 3$.
+Todos se comunican. \textbf{La cadena es irreducible y todos son recurrentes positivos.}
+\textbf{Periodicidad:} $P_{2,2} = 1/2 > 0 \implies d(2)=1$. \textbf{Todos los estados son aperiódicos.}
+
+\subsection{Probabilidad de Alcance}
+Probabilidad $a_2$ de llegar al estado 3 \textit{antes} que al 1 partiendo desde 2 ($a_3=1, a_1=0$):
+\begin{align}
+    a_2 &= P_{2,1}(0) + P_{2,2}a_2 + P_{2,3}(1) = \frac{1}{2}a_2 + \frac{1}{3} \implies \frac{1}{2}a_2 = \frac{1}{3} \implies a_2 = \frac{2}{3}
+\end{align}
+Hay $66.6\%$ de probabilidad de llegar a 3 antes que a 1.
+
+\subsection{Tiempos de Paro (Hitting Times)}
+Tiempo esperado $m_{1,3}$ para llegar a 3 desde 1 ($m_{3,3}=0$):
+\begin{align}
+    m_{1,3} &= 1 + 1(m_{2,3}) = 1 + m_{2,3} \\
+    m_{2,3} &= 1 + \frac{1}{6}m_{1,3} + \frac{1}{2}m_{2,3} \implies \frac{1}{2}m_{2,3} = 1 + \frac{1}{6}m_{1,3} \implies m_{2,3} = 2 + \frac{1}{3}m_{1,3}
+\end{align}
+Sustituimos: $m_{2,3} = 2 + \frac{1}{3}(1+m_{2,3}) = \frac{7}{3} + \frac{1}{3}m_{2,3} \implies \frac{2}{3}m_{2,3} = \frac{7}{3} \implies m_{2,3} = 3.5 \text{ pasos.}$
+Por ende $m_{1,3} = 1 + 3.5 = 4.5 \text{ pasos}$.
+
+\subsection{Distribución Estacionaria y Teorema Ergódico}
+\begin{align}
+    \pi_1 &= \frac{1}{6}\pi_2 \\
+    \pi_3 &= \frac{1}{3}\pi_2 + \frac{1}{3}\pi_3 \implies \frac{2}{3}\pi_3 = \frac{1}{3}\pi_2 \implies \pi_3 = \frac{1}{2}\pi_2
+\end{align}
+En la normalización: $\frac{1}{6}\pi_2 + \pi_2 + \frac{1}{2}\pi_2 = 1 \implies \frac{10}{6}\pi_2 = 1 \implies \pi_2 = \frac{3}{5}$.
+Valores: $\pi = \left[ \frac{1}{10}, \frac{6}{10}, \frac{3}{10} \right]$.
+Tiempos de retorno ($r_i=1/\pi_i$): $r_1=10, r_2=1.67, r_3=3.33 \text{ pasos}$.
+
+\subsection{Diagonalización Completa (Paso a Paso)}
+\textbf{Paso 1: Eigenvalores.} $\text{Tr}(P) = 5/6$. $\det(P) = -1/18$. Sabiendo que $\lambda_1 = 1$:
+$\lambda_2 + \lambda_3 = -1/6$ y $\lambda_2 \cdot \lambda_3 = -1/18$. Las raíces son $\lambda_2 = 1/6$ y $\lambda_3 = -1/3$. 
+
+\textbf{Paso 2: Eigenvectores.}
+Para $\lambda_1 = 1$: El eigenvector derecho estocástico siempre es $v_1 = [1, 1, 1]^T$.
+Para $\lambda_2 = 1/6$: Resolvemos $(P - 1/6I)v_2 = 0$. Fila 1 da $-1/6x_1 + x_2 = 0 \implies x_1 = 6x_2$. Fila 3 da $2/3x_2 + 1/6x_3 = 0 \implies x_3 = -4x_2$. Si $x_2=1$, $v_2 = [6, 1, -4]^T$.
+Para $\lambda_3 = -1/3$: Resolvemos $(P + 1/3I)v_3 = 0$. Fila 1 da $1/3x_1 + x_2 = 0 \implies x_1 = -3x_2$. Fila 3 da $2/3x_2 + 2/3x_3 = 0 \implies x_3 = -x_2$. Si $x_2=1$, $v_3 = [-3, 1, -1]^T$.
+Al tener 3 eigenvectores independientes, \textbf{se diagonaliza perfectamente} formando la matriz $V$ con las columnas de $v_i$.
+
+\section{Ejercicio Integrador 2: Modelado Computacional Detallado}
+Esta matriz modela los estados de carga de procesamiento de un clúster de cómputo (1: Baja, 2: Media, 3: Alta):
+$$ P = \begin{bmatrix} 1/2 & 1/2 & 0 \\ 1/4 & 1/2 & 1/4 \\ 0 & 1/2 & 1/2 \end{bmatrix} $$
+
+\subsection{Diagrama de Transición de Estados}
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+   \node[state] (q_1) {$1$};
+   \node[state] (q_2) [right=of q_1] {$2$};
+   \node[state] (q_3) [right=of q_2] {$3$};
+   \path[->]
+    (q_1) edge [loop above] node {1/2} ()
+          edge [bend left] node {1/2} (q_2)
+    (q_2) edge [bend left] node {1/4} (q_1)
+          edge [loop above] node {1/2} ()
+          edge [bend left] node {1/4} (q_3)
+    (q_3) edge [bend left] node {1/2} (q_2)
+          edge [loop above] node {1/2} ();
+\end{tikzpicture}
+\end{center}
+
+\subsection{Clasificación: Irreducibilidad y Periodicidad}
+\textbf{Justificación de Comunicación:}
+\begin{itemize}
+    \item $P_{1,2} = 1/2 > 0$ y $P_{2,1} = 1/4 > 0 \implies 1 \leftrightarrow 2$.
+    \item $P_{2,3} = 1/4 > 0$ y $P_{3,2} = 1/2 > 0 \implies 2 \leftrightarrow 3$.
+\end{itemize}
+Por la propiedad de transitividad, si $1 \leftrightarrow 2$ y $2 \leftrightarrow 3$, entonces $1 \leftrightarrow 3$. Todos los estados se comunican formando una sola clase de equivalencia. \textbf{La cadena es irreducible.}
+
+\textbf{Justificación de Periodicidad:}
+Los tres estados tienen probabilidades no nulas de mantenerse en el mismo estado durante el siguiente paso ($P_{1,1}=1/2$, $P_{2,2}=1/2$, $P_{3,3}=1/2$). El máximo común divisor de los tiempos de retorno a cualquiera de estos estados es 1. Por lo tanto, la cadena es completamente \textbf{aperiódica}. Además, como es una cadena finita irreducible, sabemos de inmediato que todos sus estados son \textbf{recurrentes positivos}. No existen estados transitorios ni absorbentes.
+
+\subsection{Probabilidad de Alcance (Análogo a Absorción)}
+Calculemos $a_2$, la probabilidad de que partiendo del estado 2 (Carga Media), el clúster alcance el estado 3 (Carga Alta) \textbf{antes} de volver al estado 1 (Carga Baja).
+\textbf{Condiciones de Frontera:} $a_3 = 1$ y $a_1 = 0$. Planteamos el sistema:
+\begin{align}
+    a_2 &= P_{2,1}a_1 + P_{2,2}a_2 + P_{2,3}a_3 = \frac{1}{4}(0) + \frac{1}{2}(a_2) + \frac{1}{4}(1) = \frac{1}{2}a_2 + \frac{1}{4}
+\end{align}
+Despejamos: $\frac{1}{2}a_2 = \frac{1}{4} \implies a_2 = \frac{1}{2}$. Hay un 50\% de probabilidad de que el servidor se sature antes de estabilizarse.
+
+\subsection{Tiempos de Paro (Hitting Times)}
+Calcularemos el número de pasos esperado $m_{1,3}$ para que el servidor transicione desde Carga Baja hasta Carga Alta ($m_{3,3} = 0$).
+\begin{align}
+    m_{1,3} &= 1 + P_{1,1}m_{1,3} + P_{1,2}m_{2,3} \implies m_{1,3} = 1 + \frac{1}{2}m_{1,3} + \frac{1}{2}m_{2,3} \implies \frac{1}{2}m_{1,3} = 1 + \frac{1}{2}m_{2,3} \\
+    m_{2,3} &= 1 + P_{2,1}m_{1,3} + P_{2,2}m_{2,3} \implies m_{2,3} = 1 + \frac{1}{4}m_{1,3} + \frac{1}{2}m_{2,3} \implies \frac{1}{2}m_{2,3} = 1 + \frac{1}{4}m_{1,3} 
+\end{align}
+Sustituimos la Ecuación (21) en la (20):
+\begin{align*}
+    \frac{1}{2}m_{1,3} &= 1 + \left( 1 + \frac{1}{4}m_{1,3} \right) = 2 + \frac{1}{4}m_{1,3} \implies \frac{1}{4}m_{1,3} = 2 \implies m_{1,3} = 8 \text{ pasos.}
+\end{align*}
+Sustituyendo de vuelta, obtenemos $m_{2,3} = 6 \text{ pasos}$.
+
+\subsection{Distribución Estacionaria y Teorema Ergódico}
+Planteamos el sistema de balance global ($\pi = \pi P$):
+\begin{align}
+    \pi_1 &= \frac{1}{2}\pi_1 + \frac{1}{4}\pi_2 + 0\pi_3 \implies \frac{1}{2}\pi_1 = \frac{1}{4}\pi_2 \implies \pi_1 = \frac{1}{2}\pi_2 \\
+    \pi_3 &= 0\pi_1 + \frac{1}{4}\pi_2 + \frac{1}{2}\pi_3 \implies \frac{1}{2}\pi_3 = \frac{1}{4}\pi_2 \implies \pi_3 = \frac{1}{2}\pi_2 
+\end{align}
+En la normalización: $\frac{1}{2}\pi_2 + \pi_2 + \frac{1}{2}\pi_2 = 1 \implies 2\pi_2 = 1 \implies \pi_2 = \frac{1}{2}$.
+La distribución estacionaria es $\pi = \left[ \frac{1}{4}, \frac{1}{2}, \frac{1}{4} \right]$.
+Tiempos de retorno ($r_i = 1/\pi_i$): $r_1=4, r_2=2, r_3=4 \text{ pasos}$.
+
+\subsection{Diagonalización Completa (Paso a Paso Algebraico)}
+\textbf{Paso 1: Calcular los Eigenvalores ($\lambda$)}
+Polinomio característico $\det(P - \lambda I) = 0$:
+$$ \begin{vmatrix} 1/2-\lambda & 1/2 & 0 \\ 1/4 & 1/2-\lambda & 1/4 \\ 0 & 1/2 & 1/2-\lambda \end{vmatrix} = (1/2-\lambda) \left[ (1/2-\lambda)^2 - \frac{1}{8} \right] - \frac{1}{2} \left[ \frac{1}{4}(1/2-\lambda) \right] = 0 $$
+Factorizamos el término común $(1/2-\lambda)$:
+\begin{align*}
+    (1/2-\lambda) \left[ (1/2-\lambda)^2 - \frac{1}{4} \right] &= 0
+\end{align*}
+Raíz 1: $\lambda_1 = 1/2$. Raíces 2 y 3: $(1/2-\lambda)^2 = 1/4 \implies 1/2-\lambda = \pm 1/2 \implies \lambda_2=0, \lambda_3=1$.
+Como los eigenvalores son distintos, es diagonalizable.
+
+\textbf{Paso 2: Calcular los Eigenvectores}
+Para $\lambda_3 = 1$: El eigenvector estocástico es $v_3 = [1, 1, 1]^T$.
+Para $\lambda_1 = 1/2$: Resolvemos $(P - 1/2 I)v_1 = 0 \implies \frac{1}{2}x_2=0$ y $\frac{1}{4}x_1+\frac{1}{4}x_3=0$. Resulta $v_1 = [1, 0, -1]^T$.
+Para $\lambda_2 = 0$: Resolvemos $Pv_2 = 0 \implies \frac{1}{2}x_1+\frac{1}{2}x_2=0$ y $\frac{1}{2}x_2+\frac{1}{2}x_3=0$. Resulta $v_2 = [1, -1, 1]^T$.
+Con estos eigenvectores, construimos la matriz de paso $V$ que cumple $P = VDV^{-1}$.
+
+\section{Ejercicio Definitivo: Análisis Total y Desmenuzado de una Cadena de 4x4}
+Para concluir, analicemos de principio a fin una matriz estratégicamente diseñada que integra \textbf{absolutamente todos} los conceptos estocásticos y de álgebra lineal en un solo sistema. 
+
+Consideremos el espacio de estados $S = \{1, 2, 3, 4\}$ y la matriz de transición de un paso $P$:
+$$ P = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 1/4 & 1/2 & 1/8 & 1/8 \\ 0 & 0 & 3/4 & 1/4 \\ 0 & 0 & 1/2 & 1/2 \end{bmatrix} $$
+
+\subsection{Diagrama de Transición de Estados}
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=3.5cm,on grid,auto]
+   \node[state] (q_1) {$1$};
+   \node[state] (q_2) [right=of q_1] {$2$};
+   \node[state] (q_3) [below=of q_1] {$3$};
+   \node[state] (q_4) [right=of q_3] {$4$};
+   \path[->]
+    (q_1) edge [loop left] node {1} ()
+    (q_2) edge [bend right=15] node[above] {1/4} (q_1)
+          edge [loop right] node {1/2} ()
+          edge [bend right=15] node[left] {1/8} (q_3)
+          edge [bend left=15] node[right] {1/8} (q_4)
+    (q_3) edge [loop left] node {3/4} ()
+          edge [bend left=15] node[above] {1/4} (q_4)
+    (q_4) edge [bend left=15] node[below] {1/2} (q_3)
+          edge [loop right] node {1/2} ();
+\end{tikzpicture}
+\end{center}
+
+\subsection{Clasificación y Periodicidad: Justificaciones Detalladas}
+\textbf{¿Es irreducible?} 
+Una cadena es irreducible solo si todos los estados se comunican. Observando la fila 1, el estado 1 solo transiciona a sí mismo. Jamás permite alcanzar los estados 2, 3 o 4. Por ende, la cadena se divide en diferentes clases. \textbf{No es irreducible.}
+
+\textbf{Desglose de Clasificación:}
+\begin{itemize}
+    \item \textbf{Estado 1:} Tiene probabilidad de transición a sí mismo de $P_{1,1} = 1$. Es un \textbf{estado absorbente}. Como forma una clase cerrada por sí mismo y su probabilidad de regreso es 1, es \textbf{recurrente positivo}.
+    \item \textbf{Estado 2:} Desde el estado 2 existe una probabilidad del $1/4$ de ir al estado 1 (del cual jamás se regresa) y una probabilidad conjunta de $1/8 + 1/8 = 1/4$ de ir a los estados 3 o 4 (de los cuales tampoco se regresa a 2). Como existe un camino de salida sin camino de retorno, la probabilidad de regresar a 2 eventualmente es menor a 1. El estado 2 es \textbf{transitorio}.
+    \item \textbf{Estados 3 y 4:} Desde 3 se puede ir a 4 ($P_{3,4} = 1/4$), y desde 4 se puede ir a 3 ($P_{4,3} = 1/2$). Además, la suma de las probabilidades entre ellos es 1, lo que significa que no pueden escapar a los estados 1 o 2. Forman una \textbf{clase cerrada irreducible}. Como el espacio es finito, ambos estados son inevitablemente \textbf{recurrentes positivos}.
+\end{itemize}
+
+\textbf{Periodicidad:}
+Basta con observar la diagonal principal de la matriz $P$. Todos los estados pueden permanecer en sí mismos en un solo paso ($P_{1,1}=1, P_{2,2}=1/2, P_{3,3}=3/4, P_{4,4}=1/2$). El máximo común divisor de los tiempos posibles de retorno es 1. \textbf{Todos los estados son aperiódicos ($d=1$).}
+
+\subsection{Probabilidades de Absorción ($a_i$)}
+Calculemos la probabilidad exacta de que la cadena, iniciando en el estado transitorio 2, termine siendo absorbida por el estado 1. Denotaremos esto como $a_2$.
+\textbf{Condiciones de Frontera:} $a_1 = 1$ (si ya estamos en 1, la probabilidad es 100\%). $a_3 = 0, a_4 = 0$ (desde la clase cerrada $\{3,4\}$ es imposible llegar al estado 1).
+
+Planteamos la ecuación condicionando sobre el primer paso:
+\begin{align}
+    a_2 &= P_{2,1}a_1 + P_{2,2}a_2 + P_{2,3}a_3 + P_{2,4}a_4 \\
+    a_2 &= \frac{1}{4}(1) + \frac{1}{2}(a_2) + \frac{1}{8}(0) + \frac{1}{8}(0) \\
+    a_2 &= \frac{1}{4} + \frac{1}{2}a_2
+\end{align}
+Agrupamos los términos con $a_2$ restando $\frac{1}{2}a_2$ en ambos lados:
+\begin{align*}
+    a_2 - \frac{1}{2}a_2 &= \frac{1}{4} \\
+    \left(\frac{2}{2} - \frac{1}{2}\right) a_2 &= \frac{1}{4} \\
+    \frac{1}{2}a_2 &= \frac{1}{4}
+\end{align*}
+Despejamos multiplicando por 2:
+\begin{align*}
+    a_2 &= 2 \left(\frac{1}{4}\right) = \frac{2}{4} = \frac{1}{2}
+\end{align*}
+Existe un 50\% de probabilidad de que la cadena sea absorbida por el estado 1 si iniciamos en 2. (El otro 50\% corresponde a ser absorbido por la clase recurrente $\{3,4\}$).
+
+\subsection{Tiempos de Paro ($t_i$)}
+Calculemos el número esperado de pasos que la cadena pasará "vagando" por el estado transitorio 2 antes de caer en \textit{cualquier} estado recurrente (ya sea el 1, el 3 o el 4). Denotaremos esto como $t_2$.
+\textbf{Condiciones de Frontera:} $t_1 = 0, t_3 = 0, t_4 = 0$ (si empezamos en un estado recurrente, el tiempo transitorio es cero).
+
+Planteamos la ecuación sumando 1 por el paso actual:
+\begin{align}
+    t_2 &= 1 + P_{2,1}t_1 + P_{2,2}t_2 + P_{2,3}t_3 + P_{2,4}t_4 \\
+    t_2 &= 1 + \frac{1}{4}(0) + \frac{1}{2}(t_2) + \frac{1}{8}(0) + \frac{1}{8}(0) \\
+    t_2 &= 1 + \frac{1}{2}t_2
+\end{align}
+Agrupamos términos restando $\frac{1}{2}t_2$ en ambos lados:
+\begin{align*}
+    t_2 - \frac{1}{2}t_2 &= 1 \\
+    \frac{1}{2}t_2 &= 1
+\end{align*}
+Despejamos multiplicando por 2:
+\begin{align*}
+    t_2 &= 2 \text{ pasos}
+\end{align*}
+En promedio, la cadena permanecerá 2 pasos en el estado transitorio antes de alcanzar su destino final a largo plazo.
+
+\subsection{Distribución Estacionaria y Teorema Ergódico}
+Dado que los estados 1 y 2 no forman parte del comportamiento ergódico de la cadena a largo plazo (uno es absorbente y el otro desaparece), analizamos la submatriz que rige la clase recurrente irreducible $\{3,4\}$. La llamaremos $P_R$:
+$$ P_R = \begin{bmatrix} 3/4 & 1/4 \\ 1/2 & 1/2 \end{bmatrix} $$
+
+Planteamos el sistema de balance global $\pi = \pi P_R$:
+\begin{align}
+    \pi_3 &= \frac{3}{4}\pi_3 + \frac{1}{2}\pi_4 \\
+    \pi_4 &= \frac{1}{4}\pi_3 + \frac{1}{2}\pi_4 \\
+    1 &= \pi_3 + \pi_4 \text{ (Normalización)}
+\end{align}
+Despejamos usando la Ecuación (31). Restamos $\frac{3}{4}\pi_3$ de ambos lados:
+\begin{align*}
+    \pi_3 - \frac{3}{4}\pi_3 &= \frac{1}{2}\pi_4 \\
+    \left(\frac{4}{4} - \frac{3}{4}\right)\pi_3 &= \frac{1}{2}\pi_4 \\
+    \frac{1}{4}\pi_3 &= \frac{1}{2}\pi_4
+\end{align*}
+Multiplicamos por 4 para despejar $\pi_3$ completamente en función de $\pi_4$:
+\begin{align*}
+    \pi_3 &= 4 \left(\frac{1}{2}\pi_4\right) = 2\pi_4
+\end{align*}
+Sustituimos esto directamente en la Ecuación de Normalización (33):
+\begin{align*}
+    2\pi_4 + \pi_4 &= 1 \\
+    3\pi_4 &= 1 \implies \pi_4 = \frac{1}{3}
+\end{align*}
+Conociendo $\pi_4$, calculamos $\pi_3$:
+\begin{align*}
+    \pi_3 &= 2 \left(\frac{1}{3}\right) = \frac{2}{3}
+\end{align*}
+La distribución límite (proporción de tiempo a largo plazo) de esta clase cerrada es $\pi = \left[ 2/3, 1/3 \right]$.
+
+\textbf{Teorema Ergódico:} El tiempo medio de retorno ($r_i$) a un estado recurrente es el inverso de su probabilidad límite:
+\begin{align*}
+    r_3 &= \frac{1}{\pi_3} = \frac{1}{2/3} = \frac{3}{2} = 1.5 \text{ pasos} \\
+    r_4 &= \frac{1}{\pi_4} = \frac{1}{1/3} = 3 \text{ pasos}
+\end{align*}
+
+\subsection{Diagonalización de la Matriz Completa 4x4 (Paso a Paso)}
+Para garantizar que podemos usar la fórmula de Chapman-Kolmogorov de forma analítica ($P^n = V D^n V^{-1}$), necesitamos demostrar que $P$ es diagonalizable encontrando sus 4 eigenvectores linealmente independientes.
+
+\textbf{Paso 1: Eigenvalores ($\lambda$)}
+Al ser una matriz triangular superior por bloques, sus eigenvalores son simplemente los eigenvalores de los bloques en su diagonal.
+\begin{itemize}
+    \item Del estado absorbente 1: $\lambda_1 = 1$.
+    \item Del estado transitorio 2: $\lambda_2 = 1/2$.
+    \item De la submatriz $P_R$: Resolvemos $\det(P_R - \lambda I) = 0$:
+    \begin{align*}
+        \left(\frac{3}{4}-\lambda\right)\left(\frac{1}{2}-\lambda\right) - \left(\frac{1}{4}\right)\left(\frac{1}{2}\right) &= 0 \\
+        \frac{3}{8} - \frac{3}{4}\lambda - \frac{1}{2}\lambda + \lambda^2 - \frac{1}{8} &= 0 \\
+        \lambda^2 - \frac{5}{4}\lambda + \frac{2}{8} &= 0 \implies \lambda^2 - \frac{5}{4}\lambda + \frac{1}{4} = 0
+    \end{align*}
+    Multiplicando por 4 para facilitar la factorización: $4\lambda^2 - 5\lambda + 1 = 0 \implies (4\lambda - 1)(\lambda - 1) = 0$.
+    Los eigenvalores de este bloque son $\lambda_3 = 1$ y $\lambda_4 = 1/4$.
+\end{itemize}
+Los eigenvalores globales de la matriz son $\lambda = \{1, 1, 1/2, 1/4\}$. Como el valor 1 está repetido, necesitamos asegurarnos de que produzca dos eigenvectores diferentes (multiplicidad geométrica de 2).
+
+\textbf{Paso 2: Eigenvectores para $\lambda = 1$}
+Resolvemos el sistema $(P - 1 I)v = 0$:
+$$ \begin{bmatrix} 1-1 & 0 & 0 & 0 \\ 1/4 & 1/2-1 & 1/8 & 1/8 \\ 0 & 0 & 3/4-1 & 1/4 \\ 0 & 0 & 1/2 & 1/2-1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 0 & 0 \\ 1/4 & -1/2 & 1/8 & 1/8 \\ 0 & 0 & -1/4 & 1/4 \\ 0 & 0 & 1/2 & -1/2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 0 \\ 0 \end{bmatrix} $$
+
+Observamos las ecuaciones resultantes:
+De la Fila 3: $-\frac{1}{4}x_3 + \frac{1}{4}x_4 = 0 \implies x_3 = x_4$.
+De la Fila 2: $\frac{1}{4}x_1 - \frac{1}{2}x_2 + \frac{1}{8}x_3 + \frac{1}{8}x_4 = 0$.
+Sustituyendo $x_3$ en lugar de $x_4$ en la Fila 2:
+\begin{align*}
+    \frac{1}{4}x_1 - \frac{1}{2}x_2 + \frac{1}{8}x_3 + \frac{1}{8}x_3 &= 0 \\
+    \frac{1}{4}x_1 - \frac{1}{2}x_2 + \frac{2}{8}x_3 &= 0 \\
+    \frac{1}{4}x_1 - \frac{1}{2}x_2 + \frac{1}{4}x_3 &= 0
+\end{align*}
+Multiplicamos toda esta ecuación por 4 para limpiarla: $x_1 - 2x_2 + x_3 = 0$.
+Para obtener dos vectores independientes, proponemos dos conjuntos de valores que cumplan esto:
+\begin{itemize}
+    \item Propuesta A: Hacemos que la parte de los estados recurrentes $\{3,4\}$ sea cero. Sea $x_3 = 0$ (y por ende $x_4 = 0$). Sea $x_2 = 1$. Entonces $x_1 - 2(1) + 0 = 0 \implies x_1 = 2$.
+    Nuestro primer eigenvector es: $v_1 = [2, 1, 0, 0]^T$.
+    \item Propuesta B: Evaluemos la relación con los estados recurrentes. Sea $x_3 = 2$ (y por ende $x_4 = 2$). Hacemos $x_2 = 0$. Entonces $x_1 - 2(0) + 2 = 0 \implies x_1 = -2$.
+    Nuestro segundo eigenvector es: $v_2 = [-2, 0, 2, 2]^T$.
+\end{itemize}
+¡Éxito! Logramos obtener dos vectores independientes para $\lambda=1$. La matriz es diagonalizable.
+
+\textbf{Paso 3: Eigenvector para $\lambda = 1/2$}
+Resolvemos el sistema $(P - \frac{1}{2} I)v = 0$:
+$$ \begin{bmatrix} 1-1/2 & 0 & 0 & 0 \\ 1/4 & 1/2-1/2 & 1/8 & 1/8 \\ 0 & 0 & 3/4-1/2 & 1/4 \\ 0 & 0 & 1/2 & 1/2-1/2 \end{bmatrix} = \begin{bmatrix} 1/2 & 0 & 0 & 0 \\ 1/4 & 0 & 1/8 & 1/8 \\ 0 & 0 & 1/4 & 1/4 \\ 0 & 0 & 1/2 & 0 \end{bmatrix} $$
+
+De la Fila 1: $\frac{1}{2}x_1 = 0 \implies x_1 = 0$.
+De la Fila 4: $\frac{1}{2}x_3 = 0 \implies x_3 = 0$.
+Sabiendo que $x_3=0$, de la Fila 3 tenemos: $\frac{1}{4}(0) + \frac{1}{4}x_4 = 0 \implies x_4 = 0$.
+Como $x_1, x_3$ y $x_4$ están forzados a ser cero, la variable $x_2$ es libre y puede tomar cualquier valor. Asignamos $x_2 = 1$.
+Nuestro tercer eigenvector es: $v_3 = [0, 1, 0, 0]^T$.
+
+\textbf{Paso 4: Eigenvector para $\lambda = 1/4$}
+Resolvemos el sistema $(P - \frac{1}{4} I)v = 0$:
+$$ \begin{bmatrix} 1-1/4 & 0 & 0 & 0 \\ 1/4 & 1/2-1/4 & 1/8 & 1/8 \\ 0 & 0 & 3/4-1/4 & 1/4 \\ 0 & 0 & 1/2 & 1/2-1/4 \end{bmatrix} = \begin{bmatrix} 3/4 & 0 & 0 & 0 \\ 1/4 & 1/4 & 1/8 & 1/8 \\ 0 & 0 & 1/2 & 1/4 \\ 0 & 0 & 1/2 & 1/4 \end{bmatrix} $$
+
+De la Fila 1: $\frac{3}{4}x_1 = 0 \implies x_1 = 0$.
+De la Fila 3 y 4 (que son idénticas): $\frac{1}{2}x_3 + \frac{1}{4}x_4 = 0$. Multiplicamos por 4: $2x_3 + x_4 = 0 \implies x_4 = -2x_3$.
+Ahora evaluamos la Fila 2, sustituyendo $x_1=0$ y $x_4 = -2x_3$:
+\begin{align*}
+    \frac{1}{4}(0) + \frac{1}{4}x_2 + \frac{1}{8}x_3 + \frac{1}{8}(-2x_3) &= 0 \\
+    \frac{1}{4}x_2 + \frac{1}{8}x_3 - \frac{2}{8}x_3 &= 0 \\
+    \frac{1}{4}x_2 - \frac{1}{8}x_3 &= 0
+\end{align*}
+Multiplicamos toda la ecuación por 8 para limpiar los denominadores:
+\begin{align*}
+    2x_2 - x_3 &= 0 \implies x_3 = 2x_2
+\end{align*}
+Proponemos un valor sencillo. Sea $x_2 = 1$.
+Esto implica que $x_3 = 2(1) = 2$.
+Sabiendo $x_3$, calculamos $x_4 = -2(2) = -4$.
+Nuestro cuarto y último eigenvector es: $v_4 = [0, 1, 2, -4]^T$.
+
+\textbf{Conclusión Final:} Hemos encontrado exitosamente los 4 eigenvectores linealmente independientes asociados a la matriz $P$. Podemos construir la matriz de eigenvectores $V$ concatenando las columnas:
+$$ V = \begin{bmatrix} 2 & -2 & 0 & 0 \\ 1 & 0 & 1 & 1 \\ 0 & 2 & 0 & 2 \\ 0 & 2 & 0 & -4 \end{bmatrix} $$
+Y con esto aseguramos que la matriz se diagonaliza perfectamente de la forma $P = V D V^{-1}$. Este desglose algebraico demuestra con total rigor el dominio absoluto de las propiedades límite de las Cadenas de Markov.
+
+\end{document}
