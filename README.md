@@ -11,4 +11,3 @@ Recopilación estructurada de notas, demostraciones teóricas y resolución de p
 **Formato y Herramientas**
 Los documentos y desarrollos matemáticos de este repositorio están estructurados utilizando:
 **Tipografía Científica:** LaTeX para el renderizado formal de ecuaciones y demostraciones.
-**Elaborado por:** Emiliano Ruiz Sánchez  
